@@ -1,6 +1,6 @@
 const SMOOTH_FACTOR = 0.9
 const CANVAS_TOP_OFFSET = 70
-const screenWidth = window.screen.width;
+const screenWidth = window.screen.width
 
 const canvas = document.getElementById('canvas')
 const logicalSize = 1600
@@ -141,6 +141,7 @@ document.addEventListener(
 				.translate(-localCenter.x, -localCenter.y)
 
 			applyTransform()
+			resetBtn.style.display = 'display'
 
 			lastTouches = [t1, t2]
 			lastMidpoint = newMid
@@ -165,8 +166,14 @@ document.addEventListener('touchend', e => {
 // Init
 applyTransform()
 
+const resetBtn = document.querySelector('.resize-btn')
+
 function resetTransform() {
 	matrix = new DOMMatrix()
 	applyTransform()
+	resetBtn.style.display = 'none'
 }
 
+resetBtn.addEventListener('touchstart', () => {
+	console.log('Нажали!')
+})

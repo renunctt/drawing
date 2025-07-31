@@ -152,15 +152,16 @@ body {
 	left: 50%;
 	transform: translateX(-50%);
 	gap: 8px;
-	background-color: transparent;
 	border: 1px solid rgba(255, 255, 255, 0.06);
-	backdrop-filter: blur(10px);
+	background-color: #212121;
+	backdrop-filter: blur(20px);
 	border-radius: 20px;
 	padding: 2px 10px;
 	color: #757575;
 	display: flex;
 	align-items: center;
 	font-size: 11px;
+	z-index: 10;
 }
 
 .resize-icon {
