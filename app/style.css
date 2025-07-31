@@ -45,7 +45,7 @@ body {
 	position: relative;
 	width: 100%;
 	max-width: 400px;
-	margin: auto auto 30px;
+	margin: auto auto 0;
 	display: flex;
 	justify-content: space-between;
 	background-color: #212121;
@@ -125,9 +125,10 @@ body {
 
 #canvas {
 	position: absolute;
-	top: 0;
-	left: 0;
-	width: 500px;
+	top: 100px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 300px;
 	background-color: #ffffff;
 	transform-origin: 0 0;
 	transform: translate(0px, 0px) scale(1) rotate(0deg);
