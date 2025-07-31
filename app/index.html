@@ -15,6 +15,8 @@
 				<canvas id="canvas" width="500" height="500"></canvas>
 			</div>
 
+			<img id="img" src="./file.gif" alt="Touch Image" />
+
 			<section class="buttons">
 				<button class="button prev">
 					<svg
@@ -131,5 +133,86 @@
 		</div>
 
 		<script src="/app.js"></script>
+
+<script>
+  const img = document.getElementById("img");
+
+  let lastTouchDist = null;
+  let lastAngle = null;
+  let startMidpoint = null;
+  let lastTransform = {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+    scale: 1,
+    rotation: 0
+  };
+
+  function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  function getAngle(touches) {
+    const dx = touches[1].clientX - touches[0].clientX;
+    const dy = touches[1].clientY - touches[0].clientY;
+    return Math.atan2(dy, dx) * 180 / Math.PI;
+  }
+
+  function getMidpoint(touches) {
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2
+    };
+  }
+
+  document.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 2) {
+      lastTouchDist = getDistance(e.touches);
+      lastAngle = getAngle(e.touches);
+      startMidpoint = getMidpoint(e.touches);
+    }
+  });
+
+  document.addEventListener("touchmove", (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault(); // отключить скролл
+      
+      const newDist = getDistance(e.touches);
+      const newAngle = getAngle(e.touches);
+      const newMid = getMidpoint(e.touches);
+
+      const scaleChange = newDist / lastTouchDist;
+      const rotationChange = newAngle - lastAngle;
+
+      lastTransform.scale *= scaleChange;
+      lastTransform.rotation += rotationChange;
+
+      lastTransform.x += newMid.x - startMidpoint.x;
+      lastTransform.y += newMid.y - startMidpoint.y;
+
+      // обновляем трансформации
+      img.style.transform = `
+        translate(-50%, -50%)
+        translate(${lastTransform.x}px, ${lastTransform.y}px)
+        scale(${lastTransform.scale})
+        rotate(${lastTransform.rotation}deg)
+      `;
+
+      // запоминаем
+      lastTouchDist = newDist;
+      lastAngle = newAngle;
+      startMidpoint = newMid;
+    }
+  });
+
+  document.addEventListener("touchend", (e) => {
+    if (e.touches.length < 2) {
+      lastTouchDist = null;
+      lastAngle = null;
+      startMidpoint = null;
+    }
+  });
+</script>
 	</body>
 </html>
