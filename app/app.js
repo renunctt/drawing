@@ -142,7 +142,7 @@ document.addEventListener(
 				.translate(-localCenter.x, -localCenter.y)
 
 			applyTransform()
-			resetBtn.style.display = 'display'
+			resetBtn.style.display = 'block'
 
 			lastTouches = [t1, t2]
 			lastMidpoint = newMid
