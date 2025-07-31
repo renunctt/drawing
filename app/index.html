@@ -131,56 +131,57 @@
 		</div>
 
 		<script src="/app.js"></script>
-		
-<script>
-  const img = document.getElementById('canvas')
 
-  let matrix = new DOMMatrix()
-  let lastTouches = null
-  let isTransforming = false
+		<script>
+			const canvas = document.getElementById('canvas')
 
-  function getDistance(t1, t2) {
-    return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
-  }
+			let matrix = new DOMMatrix()
+			let lastTouches = null
+			let isTransforming = false
 
-  function getAngle(t1, t2) {
-    return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX)
-  }
+			function getDistance(t1, t2) {
+				return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
+			}
 
-  function getMidpoint(t1, t2) {
-    return {
-      x: (t1.clientX + t2.clientX) / 2,
-      y: (t1.clientY + t2.clientY) / 2,
-    }
-  }
+			function getAngle(t1, t2) {
+				return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX)
+			}
 
-  function isTouchInsideImage(touch) {
-    const rect = img.getBoundingClientRect()
-    return (
-      touch.clientX >= rect.left &&
-      touch.clientX <= rect.right &&
-      touch.clientY >= rect.top &&
-      touch.clientY <= rect.bottom
-    )
-  }
+			function getMidpoint(t1, t2) {
+				return {
+					x: (t1.clientX + t2.clientX) / 2,
+					y: (t1.clientY + t2.clientY) / 2,
+				}
+			}
 
-  function applyTransform() {
-    const { a, b, c, d, e, f } = matrix
-    img.style.transform = `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`
-  }
+			function isTouchInsideImage(touch) {
+				const rect = canvas.getBoundingClientRect()
+				return (
+					touch.clientX >= rect.left &&
+					touch.clientX <= rect.right &&
+					touch.clientY >= rect.top &&
+					touch.clientY <= rect.bottom
+				)
+			}
 
-  document.addEventListener('touchstart', e => {
-    if (e.touches.length === 2) {
-      const [t1, t2] = e.touches
-      // Проверяем, что оба пальца на изображении
-      if (isTouchInsideImage(t1) && isTouchInsideImage(t2)) {
-        lastTouches = [t1, t2]
-        isTransforming = true
-      }
-    }
-  })
+			function applyTransform() {
+				const { a, b, c, d, e, f } = matrix
+				canvas.style.transform = `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`
+			}
 
-  document.addEventListener('touchmove', e => {
+			document.addEventListener('touchstart', e => {
+				if (e.touches.length === 2) {
+					const [t1, t2] = e.touches
+					if (isTouchInsideImage(t1) && isTouchInsideImage(t2)) {
+						lastTouches = [t1, t2]
+						isTransforming = true
+					}
+				}
+			})
+
+			document.addEventListener(
+  'touchmove',
+  e => {
     if (e.touches.length === 2 && isTransforming) {
       e.preventDefault()
 
@@ -199,31 +200,43 @@
 
       const prevAngle = getAngle(lt1, lt2)
       const newAngle = getAngle(t1, t2)
-      const rotation = newAngle - prevAngle // в радианах
+      let rotation = newAngle - prevAngle
 
       const cx = newMid.x
       const cy = newMid.y
 
-      matrix = matrix
-        .translate(cx, cy)
-        .rotate((rotation * 180) / Math.PI)
-        .scale(scale)
-        .translate(-cx, -cy)
-        .translate(dx, dy)
+      // Маленькие изменения — игнорируем
+      if (Math.abs(rotation) < 0.01) rotation = 0
+      const doRotate = Math.abs(rotation) >= 0.01
+      const doScale = Math.abs(scale - 1) >= 0.01
+
+      // Начинаем с переноса
+      matrix = matrix.translate(dx, dy)
+
+      // Потом масштаб и поворот, если надо
+      if (doRotate || doScale) {
+        matrix = matrix
+          .translate(cx, cy)
+          .rotate((rotation * 180) / Math.PI)
+          .scale(scale)
+          .translate(-cx, -cy)
+      }
 
       applyTransform()
       lastTouches = [t1, t2]
     }
-  }, { passive: false })
+  },
+  { passive: false }
+)
 
-  document.addEventListener('touchend', e => {
-    if (e.touches.length < 2) {
-      isTransforming = false
-      lastTouches = null
-    }
-  })
+			document.addEventListener('touchend', e => {
+				if (e.touches.length < 2) {
+					isTransforming = false
+					lastTouches = null
+				}
+			})
 
-  applyTransform()
-</script>
+			applyTransform()
+		</script>
 	</body>
 </html>
