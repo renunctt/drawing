@@ -123,6 +123,13 @@ body {
 	top: -40px;
 }
 
+.canvas-container {
+	display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 70px;
+}
+
 #canvas {
 	position: absolute;
 	top: 0;
