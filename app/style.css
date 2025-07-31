@@ -67,6 +67,7 @@ body {
 }
 
 .button {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -76,7 +77,30 @@ body {
 	gap: 3px;
 	font-size: 10px;
 	width: 30px;
+	z-index: 0;
 }
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  bottom: -15px;
+  left: -15px;
+  right: -15px;
+  z-index: -1; 
+}
+
+.button.pencil::before {
+  content: '';
+  position: absolute;
+  top: -35px;
+  bottom: -15px;
+  left: -15px;
+  right: -15px;
+  z-index: -1; 
+}
+
+
 
 .button.next svg {
 	transform: scaleX(-1);
