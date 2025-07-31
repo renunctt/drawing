@@ -142,7 +142,7 @@ document.addEventListener(
 				.translate(-localCenter.x, -localCenter.y)
 
 			applyTransform()
-			resetBtn.style.display = 'block'
+			resetBtn.style.display = 'flex'
 
 			lastTouches = [t1, t2]
 			lastMidpoint = newMid
@@ -167,7 +167,6 @@ document.addEventListener('touchend', e => {
 // Init
 applyTransform()
 
-
 function resetTransform() {
 	matrix = new DOMMatrix()
 	applyTransform()
@@ -175,5 +174,5 @@ function resetTransform() {
 }
 
 resetBtn.addEventListener('touchstart', () => {
-	console.log('Нажали!')
+	resetTransform()
 })
