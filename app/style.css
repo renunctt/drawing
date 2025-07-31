@@ -45,7 +45,7 @@ body {
 	position: relative;
 	width: 100%;
 	max-width: 400px;
-	margin: auto auto 20px;
+	margin: auto auto 0;
 	display: flex;
 	justify-content: space-between;
 	background-color: #212121;
