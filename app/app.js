@@ -2,6 +2,7 @@ const SMOOTH_FACTOR = 0.9
 const CANVAS_TOP_OFFSET = 70
 const screenWidth = window.screen.width
 
+const resetBtn = document.querySelector('.resize-btn')
 const canvas = document.getElementById('canvas')
 const logicalSize = 1600
 const scaleFactor = logicalSize / screenWidth
@@ -166,7 +167,6 @@ document.addEventListener('touchend', e => {
 // Init
 applyTransform()
 
-const resetBtn = document.querySelector('.resize-btn')
 
 function resetTransform() {
 	matrix = new DOMMatrix()
