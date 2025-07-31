@@ -1,9 +1,13 @@
-
 const canvas = document.getElementById('canvas')
 let matrix = new DOMMatrix()
 let isTransforming = false
 let lastTouches = null
 let lastUpdateTime = 0
+
+// Настройки чувствительности
+const scaleFactor = 0.1     // чем меньше, тем плавнее масштаб
+const rotationFactor = 0.3  // чем меньше, тем плавнее поворот
+const minDelta = 0.5        // минимальное движение в px, чтобы применить трансформацию
 
 function getDistance(t1, t2) {
 	return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
@@ -53,7 +57,7 @@ document.addEventListener(
 			e.preventDefault()
 
 			const now = performance.now()
-			if (now - lastUpdateTime < 16) return // 60fps
+			if (now - lastUpdateTime < 16) return
 
 			const [t1, t2] = e.touches
 			const [lt1, lt2] = lastTouches
@@ -61,16 +65,21 @@ document.addEventListener(
 			const prevMid = getMidpoint(lt1, lt2)
 			const newMid = getMidpoint(t1, t2)
 
+			const dx = newMid.x - prevMid.x
+			const dy = newMid.y - prevMid.y
+
+			// Пропускаем микродвижения
+			if (Math.abs(dx) < minDelta && Math.abs(dy) < minDelta) return
+
 			const prevDist = getDistance(lt1, lt2)
 			const newDist = getDistance(t1, t2)
-			const scale = newDist / prevDist
+			const rawScale = newDist / prevDist
+			const scale = 1 + (rawScale - 1) * scaleFactor
 
 			const prevAngle = getAngle(lt1, lt2)
 			const newAngle = getAngle(t1, t2)
-			const rotation = (newAngle - prevAngle) * (180 / Math.PI)
-
-			const dx = newMid.x - prevMid.x
-			const dy = newMid.y - prevMid.y
+			const rawRotation = (newAngle - prevAngle) * (180 / Math.PI)
+			const rotation = rawRotation * rotationFactor
 
 			const inverse = matrix.inverse()
 			const localDelta = new DOMPoint(dx, dy).matrixTransform(inverse)
