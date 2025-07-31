@@ -31,13 +31,18 @@ let isDrawing = false
 let lastDrawPoint = null
 
 function canvasPointFromTouch(touch) {
-	const rect = canvas.getBoundingClientRect()
+	const screenX = touch.clientX
+	const screenY = touch.clientY
+
+	const offsetTop = 70
+	const offsetLeft = (window.innerWidth - 350) / 2
+
 	const point = new DOMPoint(
-		touch.clientX - rect.left,
-		touch.clientY - rect.top
+		screenX - offsetLeft,
+		screenY - offsetTop
 	)
-	const inverse = matrix.inverse()
-	return point.matrixTransform(inverse)
+
+	return point.matrixTransform(matrix.inverse())
 }
 
 function isTouchInsideCanvas(touch) {
