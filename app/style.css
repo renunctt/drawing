@@ -39,14 +39,13 @@ body {
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
-	padding-bottom: env(safe-area-inset-bottom);
 }
 
 .buttons {
 	position: relative;
 	width: 100%;
 	max-width: 400px;
-	margin: auto auto 40px;
+	margin: auto auto env(safe-area-inset-bottom);
 	display: flex;
 	justify-content: space-between;
 	background-color: #212121;
