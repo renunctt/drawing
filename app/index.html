@@ -133,20 +133,32 @@
 		</div>
 
 		<script src="/app.js"></script>
+
 <script>
   const img = document.getElementById("img");
 
-  let lastTouchDist = null;
-  let lastAngle = null;
-  let startMidpoint = null;
-  let isTransforming = false;
-
-  const transformState = {
-    x: window.innerWidth / 2,
-    y: window.innerHeight / 2,
+  let transform = {
+    x: window.innerWidth / 2 - 100, // начальная позиция
+    y: window.innerHeight / 2 - 100,
     scale: 1,
     rotation: 0
   };
+
+  let last = {
+    dist: 0,
+    angle: 0,
+    midpoint: { x: 0, y: 0 }
+  };
+
+  let isTransforming = false;
+
+  function applyTransform() {
+    img.style.transform = `
+      translate(${transform.x}px, ${transform.y}px)
+      rotate(${transform.rotation}deg)
+      scale(${transform.scale})
+    `;
+  }
 
   function getDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
@@ -167,25 +179,22 @@
     };
   }
 
-  function isPointInsideImage(x, y) {
+  function isInsideImage(x, y) {
     const rect = img.getBoundingClientRect();
-    return (
-      x >= rect.left &&
-      x <= rect.right &&
-      y >= rect.top &&
-      y <= rect.bottom
-    );
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
   }
 
   document.addEventListener("touchstart", (e) => {
     if (e.touches.length === 2) {
       const t1 = e.touches[0];
       const t2 = e.touches[1];
-      if (isPointInsideImage(t1.clientX, t1.clientY) && isPointInsideImage(t2.clientX, t2.clientY)) {
-        lastTouchDist = getDistance(e.touches);
-        lastAngle = getAngle(e.touches);
-        startMidpoint = getMidpoint(e.touches);
+
+      if (isInsideImage(t1.clientX, t1.clientY) && isInsideImage(t2.clientX, t2.clientY)) {
         isTransforming = true;
+
+        last.dist = getDistance(e.touches);
+        last.angle = getAngle(e.touches);
+        last.midpoint = getMidpoint(e.touches);
       }
     }
   });
@@ -198,36 +207,31 @@
       const newAngle = getAngle(e.touches);
       const newMid = getMidpoint(e.touches);
 
-      const scaleChange = newDist / lastTouchDist;
-      const rotationChange = newAngle - lastAngle;
+      const scaleChange = newDist / last.dist;
+      const rotationChange = newAngle - last.angle;
 
-      transformState.scale *= scaleChange;
-      transformState.rotation += rotationChange;
+      // Сдвиг относительно касательной точки
+      transform.x = newMid.x - (newMid.x - transform.x) * scaleChange;
+      transform.y = newMid.y - (newMid.y - transform.y) * scaleChange;
 
-      transformState.x += newMid.x - startMidpoint.x;
-      transformState.y += newMid.y - startMidpoint.y;
+      transform.scale *= scaleChange;
+      transform.rotation += rotationChange;
 
-      img.style.transform = `
-        translate(-50%, -50%)
-        translate(${transformState.x}px, ${transformState.y}px)
-        scale(${transformState.scale})
-        rotate(${transformState.rotation}deg)
-      `;
+      applyTransform();
 
-      lastTouchDist = newDist;
-      lastAngle = newAngle;
-      startMidpoint = newMid;
+      last.dist = newDist;
+      last.angle = newAngle;
+      last.midpoint = newMid;
     }
   });
 
   document.addEventListener("touchend", (e) => {
     if (e.touches.length < 2) {
-      lastTouchDist = null;
-      lastAngle = null;
-      startMidpoint = null;
       isTransforming = false;
     }
   });
+
+  applyTransform(); // начальная установка
 </script>
 	</body>
 </html>
