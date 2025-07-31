@@ -195,7 +195,6 @@
 					}
 				}
 			})
-
 			document.addEventListener('touchmove', e => {
 				if (e.touches.length === 2 && isTransforming) {
 					e.preventDefault()
@@ -210,10 +209,21 @@
 					const dx = newMid.x - lastMid.x
 					const dy = newMid.y - lastMid.y
 
-					transform.x += dx
-					transform.y += dy
+					// Центр касания в локальных координатах до масштабирования
+					const offsetX = newMid.x - transform.x
+					const offsetY = newMid.y - transform.y
+
+					// Обновляем масштаб
 					transform.scale *= scaleChange
 					transform.rotation += rotationChange
+
+					// Компенсация масштабирования и поворота
+					transform.x = newMid.x - offsetX * scaleChange
+					transform.y = newMid.y - offsetY * scaleChange
+
+					// Добавляем обычное перемещение пальцев
+					transform.x += dx
+					transform.y += dy
 
 					applyTransform()
 
