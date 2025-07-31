@@ -134,7 +134,7 @@ body {
 	width: 300px;
 	background-color: #ffffff;
 	transform-origin: 0 0;
-	transform: translate(0px, -50px) scale(1) rotate(0deg);
+	transform: translateX(-50px) scale(1) rotate(0deg);
 	touch-action: none;
 	user-select: none;
 }

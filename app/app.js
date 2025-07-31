@@ -1,4 +1,3 @@
-
 const canvas = document.getElementById('canvas')
 let matrix = new DOMMatrix()
 let isTransforming = false
@@ -82,12 +81,14 @@ document.addEventListener(
 			const cx = newMid.x
 			const cy = newMid.y
 
+			const localCenter = new DOMPoint(cx, cy).matrixTransform(matrix.inverse())
+
 			matrix = matrix
 				.translate(localDx, localDy)
-				.translate(cx, cy)
+				.translate(localCenter.x, localCenter.y)
 				.rotate(rotation)
 				.scale(scale)
-				.translate(-cx, -cy)
+				.translate(-localCenter.x, -localCenter.y)
 
 			applyTransform()
 			lastTouches = [t1, t2]
