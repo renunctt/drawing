@@ -1,15 +1,9 @@
-const { height, offsetTop } = window.visualViewport
-const bottomInset = window.innerHeight - height - offsetTop
-
-const bottomMargin = `${bottomInset}px`
-
-document.querySelector('.buttons').style.marginBottom = bottomMargin
 
 const canvas = document.getElementById('canvas')
-
 let matrix = new DOMMatrix()
-let lastTouches = null
 let isTransforming = false
+let lastTouches = null
+let lastUpdateTime = 0
 
 function getDistance(t1, t2) {
 	return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
@@ -47,6 +41,7 @@ document.addEventListener('touchstart', e => {
 		if (isTouchInsideImage(t1) && isTouchInsideImage(t2)) {
 			lastTouches = [t1, t2]
 			isTransforming = true
+			lastUpdateTime = performance.now()
 		}
 	}
 })
@@ -56,6 +51,9 @@ document.addEventListener(
 	e => {
 		if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
+
+			const now = performance.now()
+			if (now - lastUpdateTime < 16) return // 60fps
 
 			const [t1, t2] = e.touches
 			const [lt1, lt2] = lastTouches
@@ -69,10 +67,7 @@ document.addEventListener(
 
 			const prevAngle = getAngle(lt1, lt2)
 			const newAngle = getAngle(t1, t2)
-			let rotation = newAngle - prevAngle
-
-			const cx = newMid.x
-			const cy = newMid.y
+			const rotation = (newAngle - prevAngle) * (180 / Math.PI)
 
 			const dx = newMid.x - prevMid.x
 			const dy = newMid.y - prevMid.y
@@ -84,18 +79,19 @@ document.addEventListener(
 			const localDx = localDelta.x - localZero.x
 			const localDy = localDelta.y - localZero.y
 
-			matrix = matrix.translate(localDx, localDy)
+			const cx = newMid.x
+			const cy = newMid.y
 
-			if (Math.abs(rotation) > 0.01 || Math.abs(scale - 1) > 0.01) {
-				matrix = matrix
-					.translate(cx, cy)
-					.rotate((rotation * 180) / Math.PI)
-					.scale(scale)
-					.translate(-cx, -cy)
-			}
+			matrix = matrix
+				.translate(localDx, localDy)
+				.translate(cx, cy)
+				.rotate(rotation)
+				.scale(scale)
+				.translate(-cx, -cy)
 
 			applyTransform()
 			lastTouches = [t1, t2]
+			lastUpdateTime = now
 		}
 	},
 	{ passive: false }

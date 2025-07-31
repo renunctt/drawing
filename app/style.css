@@ -33,6 +33,10 @@ body {
 	-webkit-user-select: none;
 }
 
+body {
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
 .wrapper {
 	width: 100%;
 	min-height: 100vh;
@@ -45,7 +49,7 @@ body {
 	position: relative;
 	width: 100%;
 	max-width: 400px;
-	margin: auto auto 0;
+	margin: auto auto 10px;
 	display: flex;
 	justify-content: space-between;
 	background-color: #212121;
@@ -127,11 +131,10 @@ body {
 	position: absolute;
 	top: 100px;
 	left: 50%;
-	transform: translateX(50%);
 	width: 300px;
 	background-color: #ffffff;
 	transform-origin: 0 0;
-	transform: translate(0px, 0px) scale(1) rotate(0deg);
+	transform: translate(0px, -50px) scale(1) rotate(0deg);
 	touch-action: none;
 	user-select: none;
 }
