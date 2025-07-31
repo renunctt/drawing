@@ -82,7 +82,17 @@ document.addEventListener('touchstart', e => {
 		const touch = e.touches[0]
 		if (isTouchInsideCanvas(touch)) {
 			lastDrawPoint = canvasPointFromTouch(touch)
+			console.log(lastDrawPoint)
 			isDrawing = true
+			ctx.beginPath()
+			ctx.arc(
+				lastDrawPoint.x,
+				lastDrawPoint.y,
+				ctx.lineWidth / 2,
+				0,
+				2 * Math.PI
+			)
+			ctx.fill()
 		}
 	} else if (e.touches.length === 2) {
 		const [t1, t2] = getOrderedTouches(e.touches)
