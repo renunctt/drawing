@@ -3,7 +3,9 @@ const canvas = document.getElementById('canvas')
 let matrix = new DOMMatrix()
 let isTransforming = false
 let lastTouches = null
-let lastUpdateTime = 0
+let lastMidpoint = null
+let lastAngle = 0
+let lastDistance = 1
 
 function getDistance(t1, t2) {
 	return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
@@ -20,7 +22,7 @@ function getMidpoint(t1, t2) {
 	}
 }
 
-function isTouchInsideImage(touch) {
+function isTouchInsideCanvas(touch) {
 	const rect = canvas.getBoundingClientRect()
 	return (
 		touch.clientX >= rect.left &&
@@ -38,10 +40,12 @@ function applyTransform() {
 document.addEventListener('touchstart', e => {
 	if (e.touches.length === 2) {
 		const [t1, t2] = e.touches
-		if (isTouchInsideImage(t1) && isTouchInsideImage(t2)) {
-			lastTouches = [t1, t2]
+		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
 			isTransforming = true
-			lastUpdateTime = performance.now()
+			lastTouches = [t1, t2]
+			lastMidpoint = getMidpoint(t1, t2)
+			lastDistance = getDistance(t1, t2)
+			lastAngle = getAngle(t1, t2)
 		}
 	}
 })
@@ -52,48 +56,36 @@ document.addEventListener(
 		if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
 
-			const now = performance.now()
-			if (now - lastUpdateTime < 16) return // 60fps
-
 			const [t1, t2] = e.touches
-			const [lt1, lt2] = lastTouches
-
-			const prevMid = getMidpoint(lt1, lt2)
 			const newMid = getMidpoint(t1, t2)
-
-			const prevDist = getDistance(lt1, lt2)
 			const newDist = getDistance(t1, t2)
-			let scale = newDist / prevDist
-      scale = 1 + (scale - 1) * SMOOTH_FACTOR
-
-			const prevAngle = getAngle(lt1, lt2)
 			const newAngle = getAngle(t1, t2)
-			let rotation = (newAngle - prevAngle) * (180 / Math.PI)
-      rotation *= SMOOTH_FACTOR
 
-			const dx = (newMid.x - prevMid.x) * SMOOTH_FACTOR
-			const dy = (newMid.y - prevMid.y) * SMOOTH_FACTOR
+			const scale = 1 + (newDist / lastDistance - 1) * SMOOTH_FACTOR
+			const rotation = (newAngle - lastAngle) * (180 / Math.PI) * SMOOTH_FACTOR
+
+			const dx = (newMid.x - lastMidpoint.x) * SMOOTH_FACTOR
+			const dy = (newMid.y - lastMidpoint.y) * SMOOTH_FACTOR
 
 			const inverse = matrix.inverse()
 			const localDelta = new DOMPoint(dx, dy).matrixTransform(inverse)
 			const localZero = new DOMPoint(0, 0).matrixTransform(inverse)
-
 			const localDx = localDelta.x - localZero.x
 			const localDy = localDelta.y - localZero.y
 
-			const cx = newMid.x
-			const cy = newMid.y
-
 			matrix = matrix
 				.translate(localDx, localDy)
-				.translate(cx, cy)
+				.translate(newMid.x, newMid.y)
 				.rotate(rotation)
 				.scale(scale)
-				.translate(-cx, -cy)
+				.translate(-newMid.x, -newMid.y)
 
 			applyTransform()
+
 			lastTouches = [t1, t2]
-			lastUpdateTime = now
+			lastMidpoint = newMid
+			lastDistance = newDist
+			lastAngle = newAngle
 		}
 	},
 	{ passive: false }
