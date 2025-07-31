@@ -37,12 +37,16 @@ function canvasPointFromTouch(touch) {
 	const offsetTop = 70
 	const offsetLeft = (window.innerWidth - 350) / 2
 
-	const point = new DOMPoint(
-		screenX - offsetLeft,
-		screenY - offsetTop
-	)
+	const point = new DOMPoint(screenX - offsetLeft, screenY - offsetTop)
 
 	return point.matrixTransform(matrix.inverse())
+}
+
+function getAngleDiff(a, b) {
+	let diff = a - b
+	while (diff < -Math.PI) diff += 2 * Math.PI
+	while (diff > Math.PI) diff -= 2 * Math.PI
+	return diff
 }
 
 function getOrderedTouches(touchList) {
@@ -107,7 +111,8 @@ document.addEventListener(
 			const newAngle = getAngle(t1, t2)
 
 			const scale = 1 + (newDist / lastDistance - 1) * SMOOTH_FACTOR
-			const rotation = (newAngle - lastAngle) * (180 / Math.PI) * SMOOTH_FACTOR
+			const angleDiff = getAngleDiff(newAngle, lastAngle)
+			const rotation = angleDiff * (180 / Math.PI) * SMOOTH_FACTOR
 
 			const dx = (newMid.x - lastMidpoint.x) * SMOOTH_FACTOR
 			const dy = (newMid.y - lastMidpoint.y) * SMOOTH_FACTOR
