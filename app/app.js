@@ -1,9 +1,10 @@
 const SMOOTH_FACTOR = 0.9
 const CANVAS_TOP_OFFSET = 70
+const screenWidth = window.screen.width;
 
 const canvas = document.getElementById('canvas')
 const logicalSize = 1600
-const scaleFactor = 5
+const scaleFactor = logicalSize / screenWidth
 
 canvas.width = logicalSize
 canvas.height = logicalSize
@@ -59,9 +60,8 @@ const isTouchInsideCanvas = touch => {
 // ==== Coordinate Conversion ====
 
 function canvasPointFromTouch(touch) {
-	const offsetLeft = (window.innerWidth - 320) / 2
 	const screenPoint = new DOMPoint(
-		touch.clientX - offsetLeft,
+		touch.clientX,
 		touch.clientY - CANVAS_TOP_OFFSET
 	)
 	return screenPoint.matrixTransform(matrix.inverse())
@@ -164,3 +164,9 @@ document.addEventListener('touchend', e => {
 
 // Init
 applyTransform()
+
+function resetTransform() {
+	matrix = new DOMMatrix()
+	applyTransform()
+}
+
