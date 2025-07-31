@@ -53,9 +53,11 @@ function applyTransform() {
 
 document.addEventListener('touchstart', e => {
 	if (e.touches.length === 1 && !isTransforming) {
-		const p = canvasPointFromTouch(e.touches[0])
-		isDrawing = true
-		lastDrawPoint = p
+		if (isTouchInsideCanvas(e.touches[0])) {
+			const p = canvasPointFromTouch(e.touches[0])
+			isDrawing = true
+			lastDrawPoint = p
+		}
 	} else if (e.touches.length === 2) {
 		const [t1, t2] = e.touches
 		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
@@ -64,6 +66,8 @@ document.addEventListener('touchstart', e => {
 			lastMidpoint = getMidpoint(t1, t2)
 			lastDistance = getDistance(t1, t2)
 			lastAngle = getAngle(t1, t2)
+			isDrawing = false // ⛔ отключаем рисование
+			lastDrawPoint = null
 		}
 	}
 })
@@ -72,17 +76,17 @@ document.addEventListener(
 	'touchmove',
 	e => {
 		if (e.touches.length === 1 && isDrawing) {
-		e.preventDefault()
-		const p = canvasPointFromTouch(e.touches[0])
-		ctx.beginPath()
-		ctx.moveTo(lastDrawPoint.x, lastDrawPoint.y)
-		ctx.lineTo(p.x, p.y)
-		ctx.stroke()
-		lastDrawPoint = p
-	}
-    if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
+			const p = canvasPointFromTouch(e.touches[0])
+			ctx.beginPath()
+			ctx.moveTo(lastDrawPoint.x, lastDrawPoint.y)
+			ctx.lineTo(p.x, p.y)
+			ctx.stroke()
+			lastDrawPoint = p
+		}
 
+		if (e.touches.length === 2 && isTransforming) {
+			e.preventDefault()
 			const [t1, t2] = e.touches
 			const newMid = getMidpoint(t1, t2)
 			const newDist = getDistance(t1, t2)
@@ -91,17 +95,14 @@ document.addEventListener(
 			const scale = 1 + (newDist / lastDistance - 1) * SMOOTH_FACTOR
 			const rotation = (newAngle - lastAngle) * (180 / Math.PI) * SMOOTH_FACTOR
 
-			// Глобальный дельта-сдвиг
 			const dx = (newMid.x - lastMidpoint.x) * SMOOTH_FACTOR
 			const dy = (newMid.y - lastMidpoint.y) * SMOOTH_FACTOR
 
-			// Центр касания в локальных координатах
 			const inverse = matrix.inverse()
 			const localCenter = new DOMPoint(newMid.x, newMid.y).matrixTransform(
 				inverse
 			)
 
-			// Сдвиг тоже в локальных координатах
 			const localDelta = new DOMPoint(dx, dy).matrixTransform(inverse)
 			const localOrigin = new DOMPoint(0, 0).matrixTransform(inverse)
 			const localDx = localDelta.x - localOrigin.x
@@ -130,7 +131,7 @@ document.addEventListener('touchend', e => {
 		isTransforming = false
 		lastTouches = null
 	}
-  if (e.touches.length === 0) {
+	if (e.touches.length === 0) {
 		isDrawing = false
 		lastDrawPoint = null
 	}
