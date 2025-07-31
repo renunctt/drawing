@@ -100,7 +100,7 @@ body {
 	border-radius: 50%;
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	backdrop-filter: blur(4px);
-	z-index: 3;
+	z-index: 4;
 }
 
 .pencil-bg {
@@ -125,10 +125,12 @@ body {
 }
 
 .canvas-container {
+	position: relative;
 	display: flex;
 	align-items: flex-start;
 	justify-content: center;
 	padding-top: 70px;
+	z-index: 3;
 }
 
 #canvas {
