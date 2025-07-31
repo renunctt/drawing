@@ -123,15 +123,9 @@ body {
 	top: -40px;
 }
 
-.canvas-container {
-	position: relative;
-	width: 300px;
-	margin: 0 auto;
-}
-
 #canvas {
 	position: absolute;
-	top: 70px;
+	top: 0;
 	left: 0;
 	width: 300px;
 	background-color: #ffffff;
