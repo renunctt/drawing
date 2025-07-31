@@ -78,6 +78,8 @@ function applyTransform() {
 
 // ==== Touch Events ====
 
+let currentStroke = null
+
 document.addEventListener('touchstart', e => {
 	if (e.touches.length === 1 && !isTransforming) {
 		const touch = e.touches[0]
@@ -85,6 +87,11 @@ document.addEventListener('touchstart', e => {
 			lastDrawPoint = canvasPointFromTouch(touch)
 			isDrawing = true
 			hasMoved = false
+			currentStroke = {
+				tool: 'pen',
+				color: 'rgba(0, 0, 0, 1)',
+				points: [lastDrawPoint],
+			}
 		}
 	} else if (e.touches.length === 2) {
 		const [t1, t2] = getOrderedTouches(e.touches)
@@ -112,6 +119,8 @@ document.addEventListener(
 			ctx.lineTo(p.x, p.y)
 			ctx.stroke()
 			lastDrawPoint = p
+			currentStroke.points.push(p)
+
 			hasMoved = true
 		} else if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
@@ -156,6 +165,8 @@ document.addEventListener(
 	{ passive: false }
 )
 
+const drawingHistory = []
+
 document.addEventListener('touchend', e => {
 	if (e.touches.length < 2) {
 		isTransforming = false
@@ -172,10 +183,18 @@ document.addEventListener('touchend', e => {
 				2 * Math.PI
 			)
 			ctx.fill()
+			currentStroke.points.push(lastDrawPoint)
+		}
+
+		if (isDrawing && currentStroke) {
+			drawingHistory.push(currentStroke)
+			currentStroke = null
 		}
 		isDrawing = false
 		lastDrawPoint = null
 		hasMoved = false
+
+		console.log(drawingHistory)
 	}
 })
 
@@ -191,3 +210,46 @@ function resetTransform() {
 resetBtn.addEventListener('touchstart', () => {
 	resetTransform()
 })
+
+function undoLastStroke() {
+  if (drawingHistory.length === 0) return
+
+  // Удаляем последний штрих
+  drawingHistory.pop()
+
+  // Очищаем канвас
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+  // Применяем масштаб (если ты его применял)
+  ctx.save()
+  ctx.setTransform(1, 0, 0, 1, 0, 0) // сброс трансформаций
+  ctx.scale(scaleFactor, scaleFactor)
+
+  // Перерисовываем всё из истории
+  for (const stroke of drawingHistory) {
+    ctx.globalAlpha = stroke.opacity ?? 1
+    ctx.strokeStyle = stroke.color
+    ctx.lineWidth = stroke.lineWidth ?? 3
+    ctx.beginPath()
+
+    const points = stroke.points
+    if (points.length === 1) {
+      const p = points[0]
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, ctx.lineWidth / 2, 0, 2 * Math.PI)
+      ctx.fillStyle = stroke.color
+      ctx.fill()
+    } else {
+      ctx.moveTo(points[0].x, points[0].y)
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y)
+      }
+      ctx.stroke()
+    }
+  }
+
+  ctx.globalAlpha = 1
+  ctx.restore()
+}
+
+document.querySelector('.prev').addEventListener('touchstart', undoLastStroke)
