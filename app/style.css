@@ -33,10 +33,6 @@ body {
 	-webkit-user-select: none;
 }
 
-body {
-	padding-bottom: env(safe-area-inset-bottom);
-}
-
 .wrapper {
 	width: 100%;
 	min-height: 100vh;
