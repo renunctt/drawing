@@ -1,10 +1,15 @@
 const SMOOTH_FACTOR = 0.9
 const CANVAS_TOP_OFFSET = 70
-const CANVAS_WIDTH = 350
 
 const canvas = document.getElementById('canvas')
+const logicalSize = 1600
+const scaleFactor = 5
+
+canvas.width = logicalSize
+canvas.height = logicalSize
 const ctx = canvas.getContext('2d')
-ctx.lineWidth = 1
+ctx.scale(scaleFactor, scaleFactor)
+ctx.lineWidth = 3
 ctx.lineCap = 'round'
 ctx.strokeStyle = '#000'
 
@@ -54,7 +59,7 @@ const isTouchInsideCanvas = touch => {
 // ==== Coordinate Conversion ====
 
 function canvasPointFromTouch(touch) {
-	const offsetLeft = (window.innerWidth - CANVAS_WIDTH) / 2
+	const offsetLeft = (window.innerWidth - 320) / 2
 	const screenPoint = new DOMPoint(
 		touch.clientX - offsetLeft,
 		touch.clientY - CANVAS_TOP_OFFSET

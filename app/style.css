@@ -131,8 +131,8 @@ body {
 }
 
 #canvas {
-	width: 350px;
-	height: 350px;
+	width: 320px;
+	height: 320px;
 	background-color: #ffffff;
 	transform-origin: 0 0;
 	transform: translate(0px, 0px) scale(1) rotate(0deg);
