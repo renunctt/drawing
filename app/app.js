@@ -164,17 +164,3 @@ document.addEventListener('touchend', e => {
 
 // Init
 applyTransform()
-
-function applySafeBottomPadding() {
-	const el = document.querySelector('.buttons')
-
-	if (window.visualViewport) {
-		const totalHeight = window.innerHeight
-		const viewportHeight = window.visualViewport.height
-
-		const bottomInset = totalHeight - viewportHeight
-		el.style.marginBottom = bottomInset + 'px'
-	}
-}
-
-window.addEventListener('DOMContentLoaded', applySafeBottomPadding)
