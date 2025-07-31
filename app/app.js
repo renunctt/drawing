@@ -1,60 +1,47 @@
 const SMOOTH_FACTOR = 0.9
+const CANVAS_TOP_OFFSET = 70
+const CANVAS_WIDTH = 350
+
 const canvas = document.getElementById('canvas')
-let matrix = new DOMMatrix()
-let isTransforming = false
-let lastTouches = null
-let lastMidpoint = null
-let lastAngle = 0
-let lastDistance = 1
-
-function getDistance(t1, t2) {
-	return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
-}
-
-function getAngle(t1, t2) {
-	return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX)
-}
-
-function getMidpoint(t1, t2) {
-	return {
-		x: (t1.clientX + t2.clientX) / 2,
-		y: (t1.clientY + t2.clientY) / 2,
-	}
-}
-
 const ctx = canvas.getContext('2d')
 ctx.lineWidth = 1
 ctx.lineCap = 'round'
 ctx.strokeStyle = '#000'
 
+let matrix = new DOMMatrix()
+let isTransforming = false
 let isDrawing = false
+
+let lastTouches = null
 let lastDrawPoint = null
+let lastMidpoint = null
+let lastAngle = 0
+let lastDistance = 1
 
-function canvasPointFromTouch(touch) {
-	const screenX = touch.clientX
-	const screenY = touch.clientY
+// ==== Touch Utils ====
 
-	const offsetTop = 70
-	const offsetLeft = (window.innerWidth - 350) / 2
+const getOrderedTouches = touchList =>
+	Array.from(touchList).sort((a, b) => a.identifier - b.identifier)
 
-	const point = new DOMPoint(screenX - offsetLeft, screenY - offsetTop)
+const getDistance = (t1, t2) =>
+	Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
 
-	return point.matrixTransform(matrix.inverse())
-}
+const getAngle = (t1, t2) =>
+	Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX)
 
-function getAngleDiff(a, b) {
+const getMidpoint = (t1, t2) => ({
+	x: (t1.clientX + t2.clientX) / 2,
+	y: (t1.clientY + t2.clientY) / 2,
+})
+
+const getAngleDiff = (a, b) => {
 	let diff = a - b
 	while (diff < -Math.PI) diff += 2 * Math.PI
 	while (diff > Math.PI) diff -= 2 * Math.PI
 	return diff
 }
 
-function getOrderedTouches(touchList) {
-	const touches = Array.from(touchList)
-	return touches.sort((a, b) => a.identifier - b.identifier)
-}
-
-function isTouchInsideCanvas(touch) {
+const isTouchInsideCanvas = touch => {
 	const rect = canvas.getBoundingClientRect()
 	return (
 		touch.clientX >= rect.left &&
@@ -64,17 +51,32 @@ function isTouchInsideCanvas(touch) {
 	)
 }
 
+// ==== Coordinate Conversion ====
+
+function canvasPointFromTouch(touch) {
+	const offsetLeft = (window.innerWidth - CANVAS_WIDTH) / 2
+	const screenPoint = new DOMPoint(
+		touch.clientX - offsetLeft,
+		touch.clientY - CANVAS_TOP_OFFSET
+	)
+	return screenPoint.matrixTransform(matrix.inverse())
+}
+
+// ==== Transform Application ====
+
 function applyTransform() {
 	const { a, b, c, d, e, f } = matrix
 	canvas.style.transform = `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`
 }
 
+// ==== Touch Events ====
+
 document.addEventListener('touchstart', e => {
 	if (e.touches.length === 1 && !isTransforming) {
-		if (isTouchInsideCanvas(e.touches[0])) {
-			const p = canvasPointFromTouch(e.touches[0])
+		const touch = e.touches[0]
+		if (isTouchInsideCanvas(touch)) {
+			lastDrawPoint = canvasPointFromTouch(touch)
 			isDrawing = true
-			lastDrawPoint = p
 		}
 	} else if (e.touches.length === 2) {
 		const [t1, t2] = getOrderedTouches(e.touches)
@@ -84,7 +86,7 @@ document.addEventListener('touchstart', e => {
 			lastMidpoint = getMidpoint(t1, t2)
 			lastDistance = getDistance(t1, t2)
 			lastAngle = getAngle(t1, t2)
-			isDrawing = false // ⛔ отключаем рисование
+			isDrawing = false
 			lastDrawPoint = null
 		}
 	}
@@ -95,15 +97,14 @@ document.addEventListener(
 	e => {
 		if (e.touches.length === 1 && isDrawing) {
 			e.preventDefault()
-			const p = canvasPointFromTouch(e.touches[0])
+			const touch = e.touches[0]
+			const p = canvasPointFromTouch(touch)
 			ctx.beginPath()
 			ctx.moveTo(lastDrawPoint.x, lastDrawPoint.y)
 			ctx.lineTo(p.x, p.y)
 			ctx.stroke()
 			lastDrawPoint = p
-		}
-
-		if (e.touches.length === 2 && isTransforming) {
+		} else if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
 			const [t1, t2] = getOrderedTouches(e.touches)
 			const newMid = getMidpoint(t1, t2)
@@ -111,8 +112,8 @@ document.addEventListener(
 			const newAngle = getAngle(t1, t2)
 
 			const scale = 1 + (newDist / lastDistance - 1) * SMOOTH_FACTOR
-			const angleDiff = getAngleDiff(newAngle, lastAngle)
-			const rotation = angleDiff * (180 / Math.PI) * SMOOTH_FACTOR
+			const rotationDeg =
+				getAngleDiff(newAngle, lastAngle) * (180 / Math.PI) * SMOOTH_FACTOR
 
 			const dx = (newMid.x - lastMidpoint.x) * SMOOTH_FACTOR
 			const dy = (newMid.y - lastMidpoint.y) * SMOOTH_FACTOR
@@ -121,16 +122,16 @@ document.addEventListener(
 			const localCenter = new DOMPoint(newMid.x, newMid.y).matrixTransform(
 				inverse
 			)
-
 			const localDelta = new DOMPoint(dx, dy).matrixTransform(inverse)
 			const localOrigin = new DOMPoint(0, 0).matrixTransform(inverse)
+
 			const localDx = localDelta.x - localOrigin.x
 			const localDy = localDelta.y - localOrigin.y
 
 			matrix = matrix
 				.translate(localDx, localDy)
 				.translate(localCenter.x, localCenter.y)
-				.rotate(rotation)
+				.rotate(rotationDeg)
 				.scale(scale)
 				.translate(-localCenter.x, -localCenter.y)
 
@@ -156,4 +157,5 @@ document.addEventListener('touchend', e => {
 	}
 })
 
+// Init
 applyTransform()
