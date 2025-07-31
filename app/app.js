@@ -82,7 +82,6 @@ document.addEventListener('touchstart', e => {
 		const touch = e.touches[0]
 		if (isTouchInsideCanvas(touch)) {
 			lastDrawPoint = canvasPointFromTouch(touch)
-			console.log(lastDrawPoint)
 			isDrawing = true
 			ctx.beginPath()
 			ctx.arc(
