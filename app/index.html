@@ -133,14 +133,15 @@
 		</div>
 
 		<script src="/app.js"></script>
-
 <script>
   const img = document.getElementById("img");
 
   let lastTouchDist = null;
   let lastAngle = null;
   let startMidpoint = null;
-  let lastTransform = {
+  let isTransforming = false;
+
+  const transformState = {
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
     scale: 1,
@@ -166,18 +167,33 @@
     };
   }
 
+  function isPointInsideImage(x, y) {
+    const rect = img.getBoundingClientRect();
+    return (
+      x >= rect.left &&
+      x <= rect.right &&
+      y >= rect.top &&
+      y <= rect.bottom
+    );
+  }
+
   document.addEventListener("touchstart", (e) => {
     if (e.touches.length === 2) {
-      lastTouchDist = getDistance(e.touches);
-      lastAngle = getAngle(e.touches);
-      startMidpoint = getMidpoint(e.touches);
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      if (isPointInsideImage(t1.clientX, t1.clientY) && isPointInsideImage(t2.clientX, t2.clientY)) {
+        lastTouchDist = getDistance(e.touches);
+        lastAngle = getAngle(e.touches);
+        startMidpoint = getMidpoint(e.touches);
+        isTransforming = true;
+      }
     }
   });
 
   document.addEventListener("touchmove", (e) => {
-    if (e.touches.length === 2) {
-      e.preventDefault(); // отключить скролл
-      
+    if (e.touches.length === 2 && isTransforming) {
+      e.preventDefault();
+
       const newDist = getDistance(e.touches);
       const newAngle = getAngle(e.touches);
       const newMid = getMidpoint(e.touches);
@@ -185,21 +201,19 @@
       const scaleChange = newDist / lastTouchDist;
       const rotationChange = newAngle - lastAngle;
 
-      lastTransform.scale *= scaleChange;
-      lastTransform.rotation += rotationChange;
+      transformState.scale *= scaleChange;
+      transformState.rotation += rotationChange;
 
-      lastTransform.x += newMid.x - startMidpoint.x;
-      lastTransform.y += newMid.y - startMidpoint.y;
+      transformState.x += newMid.x - startMidpoint.x;
+      transformState.y += newMid.y - startMidpoint.y;
 
-      // обновляем трансформации
       img.style.transform = `
         translate(-50%, -50%)
-        translate(${lastTransform.x}px, ${lastTransform.y}px)
-        scale(${lastTransform.scale})
-        rotate(${lastTransform.rotation}deg)
+        translate(${transformState.x}px, ${transformState.y}px)
+        scale(${transformState.scale})
+        rotate(${transformState.rotation}deg)
       `;
 
-      // запоминаем
       lastTouchDist = newDist;
       lastAngle = newAngle;
       startMidpoint = newMid;
@@ -211,6 +225,7 @@
       lastTouchDist = null;
       lastAngle = null;
       startMidpoint = null;
+      isTransforming = false;
     }
   });
 </script>
