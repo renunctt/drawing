@@ -45,6 +45,11 @@ function canvasPointFromTouch(touch) {
 	return point.matrixTransform(matrix.inverse())
 }
 
+function getOrderedTouches(touchList) {
+	const touches = Array.from(touchList)
+	return touches.sort((a, b) => a.identifier - b.identifier)
+}
+
 function isTouchInsideCanvas(touch) {
 	const rect = canvas.getBoundingClientRect()
 	return (
@@ -68,7 +73,7 @@ document.addEventListener('touchstart', e => {
 			lastDrawPoint = p
 		}
 	} else if (e.touches.length === 2) {
-		const [t1, t2] = e.touches
+		const [t1, t2] = getOrderedTouches(e.touches)
 		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
 			isTransforming = true
 			lastTouches = [t1, t2]
@@ -96,7 +101,7 @@ document.addEventListener(
 
 		if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
-			const [t1, t2] = e.touches
+			const [t1, t2] = getOrderedTouches(e.touches)
 			const newMid = getMidpoint(t1, t2)
 			const newDist = getDistance(t1, t2)
 			const newAngle = getAngle(t1, t2)
