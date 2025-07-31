@@ -1,7 +1,7 @@
 const { height, offsetTop } = window.visualViewport
 const bottomInset = window.innerHeight - height - offsetTop
 
-const bottomMargin = `${bottomInset + 10}px`
+const bottomMargin = `${bottomInset}px`
 
 document.querySelector('.buttons').style.marginBottom = bottomMargin
 
