@@ -133,31 +133,26 @@
 		</div>
 
 		<script src="/app.js"></script>
-
 <script>
   const img = document.getElementById("img");
 
+  let isTransforming = false;
+  let lastTouchDist = null;
+  let lastAngle = null;
+  let lastMid = null;
+
+  // Храним текущие трансформации
   let transform = {
-    x: window.innerWidth / 2 - 100, // начальная позиция
-    y: window.innerHeight / 2 - 100,
+    x: 100,
+    y: 100,
     scale: 1,
     rotation: 0
   };
 
-  let last = {
-    dist: 0,
-    angle: 0,
-    midpoint: { x: 0, y: 0 }
-  };
-
-  let isTransforming = false;
-
-  function applyTransform() {
-    img.style.transform = `
-      translate(${transform.x}px, ${transform.y}px)
-      rotate(${transform.rotation}deg)
-      scale(${transform.scale})
-    `;
+  // Проверка, находятся ли оба пальца на изображении
+  function isPointInsideImage(x, y) {
+    const rect = img.getBoundingClientRect();
+    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
   }
 
   function getDistance(touches) {
@@ -179,22 +174,23 @@
     };
   }
 
-  function isInsideImage(x, y) {
-    const rect = img.getBoundingClientRect();
-    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+  function applyTransform() {
+    img.style.transform = `
+      translate(${transform.x}px, ${transform.y}px)
+      scale(${transform.scale})
+      rotate(${transform.rotation}deg)
+    `;
   }
 
   document.addEventListener("touchstart", (e) => {
     if (e.touches.length === 2) {
       const t1 = e.touches[0];
       const t2 = e.touches[1];
-
-      if (isInsideImage(t1.clientX, t1.clientY) && isInsideImage(t2.clientX, t2.clientY)) {
+      if (isPointInsideImage(t1.clientX, t1.clientY) && isPointInsideImage(t2.clientX, t2.clientY)) {
+        lastTouchDist = getDistance(e.touches);
+        lastAngle = getAngle(e.touches);
+        lastMid = getMidpoint(e.touches);
         isTransforming = true;
-
-        last.dist = getDistance(e.touches);
-        last.angle = getAngle(e.touches);
-        last.midpoint = getMidpoint(e.touches);
       }
     }
   });
@@ -203,35 +199,42 @@
     if (e.touches.length === 2 && isTransforming) {
       e.preventDefault();
 
+      const newMid = getMidpoint(e.touches);
       const newDist = getDistance(e.touches);
       const newAngle = getAngle(e.touches);
-      const newMid = getMidpoint(e.touches);
 
-      const scaleChange = newDist / last.dist;
-      const rotationChange = newAngle - last.angle;
+      const scaleChange = newDist / lastTouchDist;
+      const rotationChange = newAngle - lastAngle;
 
-      // Сдвиг относительно касательной точки
-      transform.x = newMid.x - (newMid.x - transform.x) * scaleChange;
-      transform.y = newMid.y - (newMid.y - transform.y) * scaleChange;
+      // Сдвиг изображения так, чтобы трансформация происходила вокруг пальцев
+      const dx = newMid.x - lastMid.x;
+      const dy = newMid.y - lastMid.y;
 
+      // Смещение позиции с учётом масштабирования и вращения
+      transform.x += dx;
+      transform.y += dy;
       transform.scale *= scaleChange;
       transform.rotation += rotationChange;
 
       applyTransform();
 
-      last.dist = newDist;
-      last.angle = newAngle;
-      last.midpoint = newMid;
+      lastTouchDist = newDist;
+      lastAngle = newAngle;
+      lastMid = newMid;
     }
   });
 
   document.addEventListener("touchend", (e) => {
     if (e.touches.length < 2) {
       isTransforming = false;
+      lastTouchDist = null;
+      lastAngle = null;
+      lastMid = null;
     }
   });
 
-  applyTransform(); // начальная установка
+  // Начальное позиционирование
+  applyTransform();
 </script>
 	</body>
 </html>
