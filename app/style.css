@@ -42,7 +42,7 @@ body {
 }
 
 .buttons {
-  position: relative;
+	position: relative;
 	width: 100%;
 	max-width: 400px;
 	margin: auto auto 30px;
@@ -52,8 +52,8 @@ body {
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.4);
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	backdrop-filter: blur(4px);
-  border-radius: 20px;
-  padding: 0 20px;
+	border-radius: 20px;
+	padding: 0 20px;
 }
 
 .button img {
@@ -66,74 +66,71 @@ body {
 	justify-content: space-between;
 	align-items: center;
 	color: #757575;
-  padding: 5px;
-  gap: 6px;
-  font-size: 12px;
-  width: 40px;
+	padding: 5px;
+	gap: 6px;
+	font-size: 12px;
+	width: 40px;
 }
 
 .button.next svg {
-  transform: scaleX(-1);
-  margin-top: 2px;
+	transform: scaleX(-1);
+	margin-top: 2px;
 }
 
 .button.prev svg {
-  margin-top: 2px;
+	margin-top: 2px;
 }
 
 .button.palette svg {
-  margin-top: 4px;
+	margin-top: 4px;
 }
 
 .button.pencil span {
-  position: relative;
-  top: 41px;
+	position: relative;
+	top: 41px;
 }
 
 .button.pencil svg {
-  position: absolute;
-  width: 60px;
-  padding: 10px;
-  top: -30px;
-  background-color: #212121;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+	position: absolute;
+	width: 60px;
+	padding: 10px;
+	top: -30px;
+	background-color: #212121;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, 0.06);
 	backdrop-filter: blur(4px);
-  z-index: 3;
+	z-index: 3;
 }
 
 .pencil-bg {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  top: -40px;
-  background-color: #1c1c1c;
-  border-radius: 50%;
-  z-index: 1;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+	position: absolute;
+	width: 80px;
+	height: 80px;
+	top: -40px;
+	background-color: #1c1c1c;
+	border-radius: 50%;
+	z-index: 1;
+	border: 1px solid rgba(255, 255, 255, 0.06);
 	backdrop-filter: blur(4px);
 }
 
 .pencil-bg-over {
-  position: absolute;
-  width: 80px;
-  height: 40px;
-  background-color: #1c1c1c;
-  z-index: 2;
-  top: -40px;
+	position: absolute;
+	width: 80px;
+	height: 40px;
+	background-color: #1c1c1c;
+	z-index: 2;
+	top: -40px;
 }
 
 #canvas {
-  background-color: #ffffff;
+	position: absolute;
+	top: 50px;
+	left: 0;
+	width: 500px;
+	background-color: #ffffff;
+	transform-origin: 0 0;
+	transform: translate(0px, 0px) scale(1) rotate(0deg);
+	touch-action: none;
+	user-select: none;
 }
-
- #img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 200px;
-      transform-origin: 0 0;
-      transform: translate(0px, 0px) scale(1) rotate(0deg);
-      touch-action: none;
-      user-select: none;
-    }
