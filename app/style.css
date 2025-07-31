@@ -39,13 +39,14 @@ body {
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
+	padding-bottom: env(safe-area-inset-bottom);
 }
 
 .buttons {
 	position: relative;
 	width: 100%;
 	max-width: 400px;
-	margin: auto auto 30px;
+	margin: auto auto 40px;
 	display: flex;
 	justify-content: space-between;
 	background-color: #212121;
@@ -125,9 +126,9 @@ body {
 
 .canvas-container {
 	display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 70px;
+	align-items: flex-start;
+	justify-content: center;
+	padding-top: 70px;
 }
 
 #canvas {
