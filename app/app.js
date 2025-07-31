@@ -22,6 +22,20 @@ function getMidpoint(t1, t2) {
 	}
 }
 
+const ctx = canvas.getContext('2d')
+ctx.lineWidth = 2
+ctx.lineCap = 'round'
+ctx.strokeStyle = '#000'
+
+let isDrawing = false
+let lastDrawPoint = null
+
+function canvasPointFromTouch(touch) {
+	const inverse = matrix.inverse()
+	const point = new DOMPoint(touch.clientX, touch.clientY)
+	return point.matrixTransform(inverse)
+}
+
 function isTouchInsideCanvas(touch) {
 	const rect = canvas.getBoundingClientRect()
 	return (
@@ -38,7 +52,11 @@ function applyTransform() {
 }
 
 document.addEventListener('touchstart', e => {
-	if (e.touches.length === 2) {
+	if (e.touches.length === 1 && !isTransforming) {
+		const p = canvasPointFromTouch(e.touches[0])
+		isDrawing = true
+		lastDrawPoint = p
+	} else if (e.touches.length === 2) {
 		const [t1, t2] = e.touches
 		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
 			isTransforming = true
@@ -53,7 +71,16 @@ document.addEventListener('touchstart', e => {
 document.addEventListener(
 	'touchmove',
 	e => {
-		if (e.touches.length === 2 && isTransforming) {
+		if (e.touches.length === 1 && isDrawing) {
+		e.preventDefault()
+		const p = canvasPointFromTouch(e.touches[0])
+		ctx.beginPath()
+		ctx.moveTo(lastDrawPoint.x, lastDrawPoint.y)
+		ctx.lineTo(p.x, p.y)
+		ctx.stroke()
+		lastDrawPoint = p
+	}
+    if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
 
 			const [t1, t2] = e.touches
@@ -102,6 +129,10 @@ document.addEventListener('touchend', e => {
 	if (e.touches.length < 2) {
 		isTransforming = false
 		lastTouches = null
+	}
+  if (e.touches.length === 0) {
+		isDrawing = false
+		lastDrawPoint = null
 	}
 })
 
