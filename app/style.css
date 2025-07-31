@@ -127,14 +127,20 @@ body {
 	top: -40px;
 }
 
+.canvas-container {
+	position: relative;
+	width: 300px;
+	margin: 0 auto;
+}
+
 #canvas {
 	position: absolute;
-	top: 100px;
-	left: 50%;
+	top: 70px;
+	left: 0;
 	width: 300px;
 	background-color: #ffffff;
 	transform-origin: 0 0;
-	transform: translateX(-50px) scale(1) rotate(0deg);
+	transform: translate(0px, 0px) scale(1) rotate(0deg);
 	touch-action: none;
 	user-select: none;
 }
