@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+img,
+svg {
+	display: block;
+}
+
+button {
+	font-family: inherit;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+html,
+body {
+	font-family: Comfortaa, system-ui, -apple-system, 'Segoe UI', Roboto,
+		sans-serif;
+	font-weight: 400;
+	background-color: #1c1c1c;
+
+	overscroll-behavior: none;
+	overflow: hidden;
+	touch-action: none;
+	-ms-touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.wrapper {
+	width: 100%;
+	min-height: 100vh;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+.buttons {
+  position: relative;
+	width: 100%;
+	max-width: 400px;
+	margin: auto auto 30px;
+	display: flex;
+	justify-content: space-between;
+	background-color: #212121;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6), 0 4px 6px rgba(0, 0, 0, 0.4);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	backdrop-filter: blur(4px);
+  border-radius: 20px;
+  padding: 0 20px;
+}
+
+.button img {
+	width: 30px;
+}
+
+.button {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	color: #757575;
+  padding: 5px;
+  gap: 6px;
+  font-size: 12px;
+  width: 40px;
+}
+
+.button.next svg {
+  transform: scaleX(-1);
+  margin-top: 2px;
+}
+
+.button.prev svg {
+  margin-top: 2px;
+}
+
+.button.palette svg {
+  margin-top: 4px;
+}
+
+.button.pencil span {
+  position: relative;
+  top: 41px;
+}
+
+.button.pencil svg {
+  position: absolute;
+  width: 60px;
+  padding: 10px;
+  top: -30px;
+  background-color: #212121;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+	backdrop-filter: blur(4px);
+  z-index: 3;
+}
+
+.pencil-bg {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  top: -40px;
+  background-color: #1c1c1c;
+  border-radius: 50%;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+	backdrop-filter: blur(4px);
+}
+
+.pencil-bg-over {
+  position: absolute;
+  width: 80px;
+  height: 40px;
+  background-color: #1c1c1c;
+  z-index: 2;
+  top: -40px;
+}
+
+#canvas {
+  background-color: #ffffff;
+}
