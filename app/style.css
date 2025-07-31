@@ -38,19 +38,20 @@ body {
 	width: 100%;
 	height: inherit;
 	overflow: hidden;
-}
-
-.container {
-	position: relative;
-	height: inherit;
 	display: flex;
 	flex-direction: column;
 }
 
+.buttons-container {
+	margin-top: auto;
+	padding: 0 10px;
+}
+
 .buttons {
+	position: relative;
 	width: 100%;
-	max-width: 400px;
-	margin: auto auto 20px;
+	max-width: 340px;
+	margin: 0 auto 20px;
 	display: flex;
 	justify-content: space-between;
 	background-color: #212121;
@@ -58,7 +59,7 @@ body {
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	backdrop-filter: blur(4px);
 	border-radius: 20px;
-	padding: 0 20px 6px;
+	padding: 0 18px 2px;
 }
 
 .button img {
@@ -72,9 +73,9 @@ body {
 	align-items: center;
 	color: #757575;
 	padding: 5px;
-	gap: 6px;
-	font-size: 12px;
-	width: 40px;
+	gap: 3px;
+	font-size: 10px;
+	width: 30px;
 }
 
 .button.next svg {
@@ -87,45 +88,41 @@ body {
 }
 
 .button.palette svg {
-	margin-top: 4px;
+	margin-top: 3px;
 }
 
 .button.pencil span {
 	position: relative;
-	top: 41px;
+	top: 24px;
 }
 
-.button.pencil svg {
+.pencil-icon {
 	position: absolute;
 	width: 60px;
-	padding: 10px;
+	padding: 9px;
 	top: -30px;
 	background-color: #212121;
 	border-radius: 50%;
-	border: 1px solid rgba(255, 255, 255, 0.06);
 	backdrop-filter: blur(4px);
-	z-index: 4;
+	padding-bottom: 11px;
 }
+
+.pencil-icon svg {
+	border-radius: 50%;
+} 
 
 .pencil-bg {
 	position: absolute;
-	width: 80px;
-	height: 80px;
-	top: -40px;
-	background-color: #1c1c1c;
+	width: 62px;
+	height: 62px;
+	top: -31px;
+	left: calc(50%);
+	transform: translateX(-50%);
+	background-color: transparent;
 	border-radius: 50%;
-	z-index: 1;
+	z-index: -2;
 	border: 1px solid rgba(255, 255, 255, 0.06);
-	backdrop-filter: blur(4px);
-}
-
-.pencil-bg-over {
-	position: absolute;
-	width: 80px;
-	height: 40px;
-	background-color: #1c1c1c;
-	z-index: 2;
-	top: -40px;
+	 clip-path: inset(0 0 50% 0);
 }
 
 .canvas-container {
@@ -135,29 +132,16 @@ body {
 	justify-content: center;
 	pointer-events: none;
 	padding-top: 70px;
-	z-index: 3;
+	z-index: 0;
 }
 
 #canvas {
-	width: 320px;
-	height: 320px;
+	width: 100%;
+	height: auto;
 	background-color: #ffffff;
 	transform-origin: 0 0;
 	transform: translate(0px, 0px) scale(1) rotate(0deg);
 	touch-action: none;
 	user-select: none;
 	pointer-events: auto;
-}
-
-.pencil-bg {
-	z-index: 2;
-}
-
-.pencil-bg-over {
-	z-index: 3;
-}
-
-.buttons {
-	z-index: 4;
-	position: relative; /* важно, если не было */
 }
