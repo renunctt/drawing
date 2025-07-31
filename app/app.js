@@ -23,6 +23,7 @@ let lastTouches = null
 let lastDrawPoint = null
 let lastMidpoint = null
 let lastAngle = 0
+let hasMoved = false
 let lastDistance = 1
 
 // ==== Touch Utils ====
@@ -83,15 +84,7 @@ document.addEventListener('touchstart', e => {
 		if (isTouchInsideCanvas(touch)) {
 			lastDrawPoint = canvasPointFromTouch(touch)
 			isDrawing = true
-			ctx.beginPath()
-			ctx.arc(
-				lastDrawPoint.x,
-				lastDrawPoint.y,
-				ctx.lineWidth / 2,
-				0,
-				2 * Math.PI
-			)
-			ctx.fill()
+			hasMoved = false
 		}
 	} else if (e.touches.length === 2) {
 		const [t1, t2] = getOrderedTouches(e.touches)
@@ -119,6 +112,7 @@ document.addEventListener(
 			ctx.lineTo(p.x, p.y)
 			ctx.stroke()
 			lastDrawPoint = p
+			hasMoved = true
 		} else if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
 			const [t1, t2] = getOrderedTouches(e.touches)
@@ -168,8 +162,20 @@ document.addEventListener('touchend', e => {
 		lastTouches = null
 	}
 	if (e.touches.length === 0) {
+		if (isDrawing && !hasMoved && lastDrawPoint) {
+			ctx.beginPath()
+			ctx.arc(
+				lastDrawPoint.x,
+				lastDrawPoint.y,
+				ctx.lineWidth / 2,
+				0,
+				2 * Math.PI
+			)
+			ctx.fill()
+		}
 		isDrawing = false
 		lastDrawPoint = null
+		hasMoved = false
 	}
 })
 
