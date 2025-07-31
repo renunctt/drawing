@@ -31,8 +31,15 @@ let isDrawing = false
 let lastDrawPoint = null
 
 function canvasPointFromTouch(touch) {
+	const rect = canvas.getBoundingClientRect()
 	const inverse = matrix.inverse()
-	const point = new DOMPoint(touch.clientX, touch.clientY)
+
+	// Вычитаем смещение canvas, чтобы попасть точно в нужную точку
+	const point = new DOMPoint(
+		touch.clientX - rect.left,
+		touch.clientY - rect.top
+	)
+
 	return point.matrixTransform(inverse)
 }
 
