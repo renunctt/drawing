@@ -84,18 +84,22 @@ document.addEventListener('touchstart', e => {
 	const touches = e.touches
 
 	if (touches.length === 1 && !isTransforming) {
-		const touch = touches[0]
-		if (isTouchInsideCanvas(touch)) {
-			lastDrawPoint = canvasPointFromTouch(touch)
-			isDrawing = true
-			hasMoved = false
-			currentStroke = {
-				tool: 'pen',
-				color: currentStrokeColor,
-				lineWidth: currentLineWidth,
-				points: [lastDrawPoint],
+		requestAnimationFrame(() => {
+			if (isDrawing || isTransforming) return // если уже что-то началось — выходим
+			if (e.touches.length > 1) return // второй палец появился — значит, трансформация
+			const touch = e.touches[0]
+			if (isTouchInsideCanvas(touch)) {
+				lastDrawPoint = canvasPointFromTouch(touch)
+				isDrawing = true
+				hasMoved = false
+				currentStroke = {
+					tool: 'pen',
+					color: currentStrokeColor,
+					lineWidth: currentLineWidth,
+					points: [lastDrawPoint],
+				}
 			}
-		}
+		})
 	} else if (touches.length === 2 && !isDrawing) {
 		const [t1, t2] = getOrderedTouches(touches)
 		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
