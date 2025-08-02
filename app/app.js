@@ -95,6 +95,13 @@ document.addEventListener('touchstart', e => {
 			}
 		}
 	} else if (e.touches.length === 2) {
+		if (isDrawing && currentStroke && currentStroke.points.length > 0) {
+			drawingHistory.push(currentStroke)
+			currentStroke = null
+			redoHistory.length = 0
+			redrawCanvas()
+		}
+
 		const [t1, t2] = getOrderedTouches(e.touches)
 		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
 			isTransforming = true
