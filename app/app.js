@@ -95,6 +95,7 @@ document.addEventListener('touchstart', e => {
 			}
 		}
 	} else if (e.touches.length === 2) {
+		if (isDrawing) return
 		const [t1, t2] = getOrderedTouches(e.touches)
 		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
 			isTransforming = true
@@ -121,7 +122,6 @@ document.addEventListener(
 			hasMoved = true
 			redrawCanvas()
 		} else if (e.touches.length === 2 && isTransforming) {
-			if (isDrawing) return
 			e.preventDefault()
 			const [t1, t2] = getOrderedTouches(e.touches)
 			const newMid = getMidpoint(t1, t2)
