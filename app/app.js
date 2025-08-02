@@ -115,16 +115,11 @@ document.addEventListener(
 			e.preventDefault()
 			const touch = e.touches[0]
 			const p = canvasPointFromTouch(touch)
-			ctx.lineWidth = currentStroke.lineWidth
-			ctx.strokeStyle = currentStroke.color
-			ctx.beginPath()
-			ctx.moveTo(lastDrawPoint.x, lastDrawPoint.y)
-			ctx.lineTo(p.x, p.y)
-			ctx.stroke()
-			lastDrawPoint = p
+
 			currentStroke.points.push(p)
 
 			hasMoved = true
+			redrawCanvas()
 		} else if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
 			const [t1, t2] = getOrderedTouches(e.touches)
@@ -236,13 +231,19 @@ function redrawCanvas() {
 	ctx.setTransform(1, 0, 0, 1, 0, 0)
 	ctx.scale(scaleFactor, scaleFactor)
 
-	for (const stroke of drawingHistory) {
+	const allStrokes = [...drawingHistory]
+	if (isDrawing && currentStroke) {
+		allStrokes.push(currentStroke)
+	}
+
+	for (const stroke of allStrokes) {
+		const points = stroke.points
+		if (points.length === 0) continue
+
 		ctx.globalAlpha = stroke.opacity ?? 1
 		ctx.strokeStyle = stroke.color
 		ctx.lineWidth = stroke.lineWidth
-		ctx.beginPath()
 
-		const points = stroke.points
 		if (points.length === 1) {
 			const p = points[0]
 			ctx.beginPath()
@@ -250,10 +251,16 @@ function redrawCanvas() {
 			ctx.fillStyle = stroke.color
 			ctx.fill()
 		} else {
+			ctx.beginPath()
 			ctx.moveTo(points[0].x, points[0].y)
-			for (let i = 1; i < points.length; i++) {
-				ctx.lineTo(points[i].x, points[i].y)
+			for (let i = 1; i < points.length - 1; i++) {
+				const midPoint = {
+					x: (points[i].x + points[i + 1].x) / 2,
+					y: (points[i].y + points[i + 1].y) / 2,
+				}
+				ctx.quadraticCurveTo(points[i].x, points[i].y, midPoint.x, midPoint.y)
 			}
+			ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y)
 			ctx.stroke()
 		}
 	}
@@ -320,7 +327,7 @@ optionBtn.addEventListener('touchstart', () => {
 	}
 	isPaletteModalOpen = false
 	paletteBtn.classList.remove('active')
-		paletteModal.style.display = 'none'
+	paletteModal.style.display = 'none'
 	optionModal.style.display = 'flex'
 	optionBtn.classList.add('active')
 	isOptionModalOpen = true
@@ -330,13 +337,12 @@ const colorDivs = document.querySelectorAll('.palette__color')
 const currentColorDiv = document.querySelector('.current-color')
 
 colorDivs.forEach(div => {
-  div.addEventListener('touchstart', () => {
-    const color = getComputedStyle(div).backgroundColor
-    currentColorDiv.style.backgroundColor = color
-    currentStrokeColor = color
-  })
+	div.addEventListener('touchstart', () => {
+		const color = getComputedStyle(div).backgroundColor
+		currentColorDiv.style.backgroundColor = color
+		currentStrokeColor = color
+	})
 })
-
 
 paletteBtn.addEventListener('touchstart', () => {
 	if (isPaletteModalOpen) {
@@ -346,8 +352,8 @@ paletteBtn.addEventListener('touchstart', () => {
 		return
 	}
 	isOptionModalOpen = false
-		optionBtn.classList.remove('active')
-		optionModal.style.display = 'none'
+	optionBtn.classList.remove('active')
+	optionModal.style.display = 'none'
 	paletteModal.style.display = 'flex'
 	paletteBtn.classList.add('active')
 	isPaletteModalOpen = true
