@@ -185,7 +185,7 @@ document.addEventListener('touchend', e => {
 			currentStroke.points.push(lastDrawPoint)
 		}
 
-		if (isDrawing && currentStroke) {
+		if (currentStroke) {
 			drawingHistory.push(currentStroke)
 			redoHistory.length = 0
 			currentStroke = null
