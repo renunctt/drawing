@@ -118,9 +118,12 @@ document.addEventListener('touchstart', e => {
 document.addEventListener(
 	'touchmove',
 	e => {
+		if (isTransforming) return
+
 		if (e.touches.length === 1 && isDrawing) {
 			e.preventDefault()
 			const touch = e.touches[0]
+			if (!isTouchInsideCanvas(touch)) return
 			const p = canvasPointFromTouch(touch)
 
 			currentStroke.points.push(p)
