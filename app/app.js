@@ -126,7 +126,7 @@ document.addEventListener(
 
 			hasMoved = true
 			redrawCanvas()
-		} else if (e.touches.length === 2 && isTransforming) {
+		} else if (e.touches.length === 2 && isTransforming && !isDrawing) {
 			e.preventDefault()
 			const [t1, t2] = getOrderedTouches(e.touches)
 			const newMid = getMidpoint(t1, t2)
