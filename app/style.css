@@ -80,27 +80,37 @@ body {
 	z-index: 0;
 }
 
+.button.active {
+	color: #ffffff;
+}
+
+.button.active .option-path {
+	stroke: #ffffff;
+}
+
+.button.active .path {
+	fill: #ffffff;
+}
+
 .button::before {
-  content: '';
-  position: absolute;
-  top: -15px;
-  bottom: -15px;
-  left: -15px;
-  right: -15px;
-  z-index: -1; 
+	content: '';
+	position: absolute;
+	top: -15px;
+	bottom: -15px;
+	left: -15px;
+	right: -15px;
+	z-index: -1;
 }
 
 .button.pencil::before {
-  content: '';
-  position: absolute;
-  top: -35px;
-  bottom: -15px;
-  left: -15px;
-  right: -15px;
-  z-index: -1; 
+	content: '';
+	position: absolute;
+	top: -35px;
+	bottom: -15px;
+	left: -15px;
+	right: -15px;
+	z-index: -1;
 }
-
-
 
 .button.next svg {
 	transform: scaleX(-1);
@@ -133,7 +143,7 @@ body {
 
 .pencil-icon svg {
 	border-radius: 50%;
-} 
+}
 
 .pencil-bg {
 	position: absolute;
@@ -146,7 +156,7 @@ body {
 	border-radius: 50%;
 	z-index: -2;
 	border: 1px solid rgba(255, 255, 255, 0.06);
-	 clip-path: inset(0 0 50% 0);
+	clip-path: inset(0 0 50% 0);
 }
 
 .canvas-container {
@@ -195,4 +205,244 @@ body {
 
 .close-icon {
 	width: 18px;
+}
+
+.option-modal {
+	position: absolute;
+	background-color: #212121;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 20px;
+	width: 100%;
+	left: 0;
+	top: -120px;
+	display: flex;
+	flex-direction: column;
+	padding: 10px 20px;
+	gap: 15px;
+}
+
+.option__size {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.option__size div {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 27px;
+	height: 27px;
+	border-radius: 50%;
+	border: 1px solid #757575;
+}
+
+.option__size span {
+	display: block;
+	border-radius: 50%;
+	background-color: #757575;
+}
+
+.option__size div.active {
+	border-color: #ffffff;
+}
+
+.option__size div.active span {
+	background-color: #ffffff;
+}
+
+.option__size-1 span {
+	width: 3px;
+	height: 3px;
+}
+
+.option__size-3 span {
+	width: 7px;
+	height: 7px;
+}
+
+.option__size-5 span {
+	width: 11px;
+	height: 11px;
+}
+
+.option__size-10 span {
+	width: 13px;
+	height: 13px;
+}
+
+.option__size-30 span {
+	width: 17px;
+	height: 17px;
+}
+
+.option__size div::before {
+	content: '';
+	position: absolute;
+	top: -5px;
+	bottom: -5px;
+	left: -5px;
+	right: -5px;
+	z-index: -1;
+}
+
+.option__opacity {
+	display: flex;
+	gap: 20px;
+	justify-content: space-between;
+	align-items: center;
+	color: #757575;
+	font-size: 13px;
+}
+
+.option__opacity-input {
+	width: 100%;
+}
+
+.option__opacity-input {
+	-webkit-appearance: none;
+	width: 100%;
+	height: 6px;
+	background: rgba(255, 255, 255, 0.06); /* трек */
+	border-radius: 3px;
+	outline: none;
+}
+
+/* Ползунок в WebKit (Chrome, Safari) */
+.option__opacity-input::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	background: #212121; /* белая точка */
+	border: 2px solid #757575;
+	border-radius: 50%;
+	cursor: pointer;
+	margin-top: -7px; /* чтобы центрировался по треку */
+}
+
+/* Трек до ползунка */
+.option__opacity-input::-webkit-slider-runnable-track {
+	height: 6px;
+	background: rgba(255, 255, 255, 0.06);
+	border-radius: 3px;
+}
+
+/* Firefox */
+.option__opacity-input::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	background: #212121;
+	border: 2px solid #757575;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.option__opacity-input::-moz-range-track {
+	height: 6px;
+	background: rgba(255, 255, 255, 0.06);
+	border-radius: 3px;
+}
+
+/* IE/Edge (старые) */
+.option__opacity-input::-ms-thumb {
+	width: 20px;
+	height: 20px;
+	background: #212121;
+	border: 2px solid #757575;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.option__opacity-input::-ms-track {
+	height: 6px;
+	background: transparent;
+	border-color: transparent;
+	color: transparent;
+}
+
+.palette-modal {
+	position: absolute;
+	background-color: #212121;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	top: -125px;
+	display: flex;
+	padding: 10px 20px;
+	gap: 14px;
+}
+
+.palette__section {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 14px;
+}
+
+.palette__color {
+	width: 25px;
+	height: 25px;
+	border: 1px solid rgb(73, 73, 73);
+	border-radius: 4px;
+}
+
+.color-1 {
+	background-color: #000000;
+}
+
+.color-2 {
+	background-color: #666666;
+}
+
+.color-3 {
+	background-color: #0050cd;
+}
+
+.color-4 {
+	background-color: #11b03c;
+}
+
+.color-5 {
+	background-color: #ff0013;
+}
+
+.color-6 {
+	background-color: #ffffff;
+}
+
+.color-7 {
+	background-color: #ffc126;
+}
+
+.color-8 {
+	background-color: #ff008f;
+}
+
+.color-9 {
+	background-color: #865e3c;
+}
+
+.color-10 {
+	background-color: #feafa8;
+}
+
+.palette.active path {
+	fill: #ffffff;
+}
+
+.palette__section-container {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.current-color {
+	background-color: #000000;
+	width: 40px;
+	border: 1px solid rgb(73, 73, 73);
+	border-radius: 4px;
 }

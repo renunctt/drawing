@@ -6,19 +6,19 @@ const resetBtn = document.querySelector('.resize-btn')
 const canvas = document.getElementById('canvas')
 const logicalSize = 1600
 const scaleFactor = logicalSize / screenWidth
+let currentLineWidth = 3
+let currentStrokeColor = '#000000'
 
 canvas.width = logicalSize
 canvas.height = logicalSize
 const ctx = canvas.getContext('2d')
 ctx.scale(scaleFactor, scaleFactor)
-ctx.lineWidth = 3
 ctx.lineCap = 'round'
-ctx.strokeStyle = '#000'
 
 let matrix = new DOMMatrix()
 let isTransforming = false
 let isDrawing = false
-
+const redoHistory = []
 let lastTouches = null
 let lastDrawPoint = null
 let lastMidpoint = null
@@ -89,7 +89,8 @@ document.addEventListener('touchstart', e => {
 			hasMoved = false
 			currentStroke = {
 				tool: 'pen',
-				color: 'rgba(0, 0, 0, 1)',
+				color: currentStrokeColor,
+				lineWidth: currentLineWidth,
 				points: [lastDrawPoint],
 			}
 		}
@@ -114,6 +115,8 @@ document.addEventListener(
 			e.preventDefault()
 			const touch = e.touches[0]
 			const p = canvasPointFromTouch(touch)
+			ctx.lineWidth = currentStroke.lineWidth
+			ctx.strokeStyle = currentStroke.color
 			ctx.beginPath()
 			ctx.moveTo(lastDrawPoint.x, lastDrawPoint.y)
 			ctx.lineTo(p.x, p.y)
@@ -174,11 +177,12 @@ document.addEventListener('touchend', e => {
 	}
 	if (e.touches.length === 0) {
 		if (isDrawing && !hasMoved && lastDrawPoint) {
+			ctx.fillStyle = currentStroke.color
 			ctx.beginPath()
 			ctx.arc(
 				lastDrawPoint.x,
 				lastDrawPoint.y,
-				ctx.lineWidth / 2,
+				currentStroke.lineWidth / 2,
 				0,
 				2 * Math.PI
 			)
@@ -188,13 +192,12 @@ document.addEventListener('touchend', e => {
 
 		if (isDrawing && currentStroke) {
 			drawingHistory.push(currentStroke)
+			redoHistory.length = 0
 			currentStroke = null
 		}
 		isDrawing = false
 		lastDrawPoint = null
 		hasMoved = false
-
-		console.log(drawingHistory)
 	}
 })
 
@@ -212,44 +215,150 @@ resetBtn.addEventListener('touchstart', () => {
 })
 
 function undoLastStroke() {
-  if (drawingHistory.length === 0) return
+	if (drawingHistory.length === 0) return
 
-  // Удаляем последний штрих
-  drawingHistory.pop()
-
-  // Очищаем канвас
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-  // Применяем масштаб (если ты его применял)
-  ctx.save()
-  ctx.setTransform(1, 0, 0, 1, 0, 0) // сброс трансформаций
-  ctx.scale(scaleFactor, scaleFactor)
-
-  // Перерисовываем всё из истории
-  for (const stroke of drawingHistory) {
-    ctx.globalAlpha = stroke.opacity ?? 1
-    ctx.strokeStyle = stroke.color
-    ctx.lineWidth = stroke.lineWidth ?? 3
-    ctx.beginPath()
-
-    const points = stroke.points
-    if (points.length === 1) {
-      const p = points[0]
-      ctx.beginPath()
-      ctx.arc(p.x, p.y, ctx.lineWidth / 2, 0, 2 * Math.PI)
-      ctx.fillStyle = stroke.color
-      ctx.fill()
-    } else {
-      ctx.moveTo(points[0].x, points[0].y)
-      for (let i = 1; i < points.length; i++) {
-        ctx.lineTo(points[i].x, points[i].y)
-      }
-      ctx.stroke()
-    }
-  }
-
-  ctx.globalAlpha = 1
-  ctx.restore()
+	const lastStroke = drawingHistory.pop()
+	redoHistory.push(lastStroke)
+	redrawCanvas()
 }
 
+function redoLastStroke() {
+	if (redoHistory.length === 0) return
+
+	const stroke = redoHistory.pop()
+	drawingHistory.push(stroke)
+	redrawCanvas()
+}
+
+function redrawCanvas() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height)
+	ctx.save()
+	ctx.setTransform(1, 0, 0, 1, 0, 0)
+	ctx.scale(scaleFactor, scaleFactor)
+
+	for (const stroke of drawingHistory) {
+		ctx.globalAlpha = stroke.opacity ?? 1
+		ctx.strokeStyle = stroke.color
+		ctx.lineWidth = stroke.lineWidth
+		ctx.beginPath()
+
+		const points = stroke.points
+		if (points.length === 1) {
+			const p = points[0]
+			ctx.beginPath()
+			ctx.arc(p.x, p.y, stroke.lineWidth / 2, 0, 2 * Math.PI)
+			ctx.fillStyle = stroke.color
+			ctx.fill()
+		} else {
+			ctx.moveTo(points[0].x, points[0].y)
+			for (let i = 1; i < points.length; i++) {
+				ctx.lineTo(points[i].x, points[i].y)
+			}
+			ctx.stroke()
+		}
+	}
+
+	ctx.globalAlpha = 1
+	ctx.restore()
+}
+
+const sizeBtn1 = document.querySelector('.option__size-1')
+const sizeBtn3 = document.querySelector('.option__size-3')
+const sizeBtn5 = document.querySelector('.option__size-5')
+const sizeBtn10 = document.querySelector('.option__size-10')
+const sizeBtn30 = document.querySelector('.option__size-30')
+
+function setLineWidth(size) {
+	clearSizeBtn()
+	currentLineWidth = size
+}
+
+function clearSizeBtn() {
+	sizeBtn1.classList.remove('active')
+	sizeBtn3.classList.remove('active')
+	sizeBtn5.classList.remove('active')
+	sizeBtn10.classList.remove('active')
+	sizeBtn30.classList.remove('active')
+}
+
+const setLineWidth1 = () => {
+	setLineWidth(1)
+	sizeBtn1.classList.add('active')
+}
+const setLineWidth3 = () => {
+	setLineWidth(3)
+	sizeBtn3.classList.add('active')
+}
+const setLineWidth5 = () => {
+	setLineWidth(5)
+	sizeBtn5.classList.add('active')
+}
+const setLineWidth10 = () => {
+	setLineWidth(10)
+	sizeBtn10.classList.add('active')
+}
+const setLineWidth30 = () => {
+	setLineWidth(30)
+	sizeBtn30.classList.add('active')
+}
+
+let isOptionModalOpen = false
+let isPaletteModalOpen = false
+
+const optionModal = document.querySelector('.option-modal')
+const optionBtn = document.querySelector('.options')
+
+const paletteModal = document.querySelector('.palette-modal')
+const paletteBtn = document.querySelector('.palette')
+
+optionBtn.addEventListener('touchstart', () => {
+	if (isOptionModalOpen) {
+		isOptionModalOpen = false
+		optionBtn.classList.remove('active')
+		optionModal.style.display = 'none'
+		return
+	}
+	isPaletteModalOpen = false
+	paletteBtn.classList.remove('active')
+		paletteModal.style.display = 'none'
+	optionModal.style.display = 'flex'
+	optionBtn.classList.add('active')
+	isOptionModalOpen = true
+})
+
+const colorDivs = document.querySelectorAll('.palette__color')
+const currentColorDiv = document.querySelector('.current-color')
+
+colorDivs.forEach(div => {
+  div.addEventListener('touchstart', () => {
+    const color = getComputedStyle(div).backgroundColor
+    currentColorDiv.style.backgroundColor = color
+    currentStrokeColor = color
+  })
+})
+
+
+paletteBtn.addEventListener('touchstart', () => {
+	if (isPaletteModalOpen) {
+		isPaletteModalOpen = false
+		paletteBtn.classList.remove('active')
+		paletteModal.style.display = 'none'
+		return
+	}
+	isOptionModalOpen = false
+		optionBtn.classList.remove('active')
+		optionModal.style.display = 'none'
+	paletteModal.style.display = 'flex'
+	paletteBtn.classList.add('active')
+	isPaletteModalOpen = true
+})
+
 document.querySelector('.prev').addEventListener('touchstart', undoLastStroke)
+document.querySelector('.next').addEventListener('touchstart', redoLastStroke)
+sizeBtn1.addEventListener('touchstart', setLineWidth1)
+sizeBtn3.addEventListener('touchstart', setLineWidth3)
+sizeBtn5.addEventListener('touchstart', setLineWidth5)
+sizeBtn10.addEventListener('touchstart', setLineWidth10)
+sizeBtn30.addEventListener('touchstart', setLineWidth30)
+
+setLineWidth3()
