@@ -243,6 +243,8 @@ function redrawCanvas() {
 		ctx.globalAlpha = stroke.opacity ?? 1
 		ctx.strokeStyle = stroke.color
 		ctx.lineWidth = stroke.lineWidth
+		ctx.lineJoin = 'round'
+		ctx.lineCap = 'round'
 
 		if (points.length === 1) {
 			const p = points[0]
@@ -250,6 +252,12 @@ function redrawCanvas() {
 			ctx.arc(p.x, p.y, stroke.lineWidth / 2, 0, 2 * Math.PI)
 			ctx.fillStyle = stroke.color
 			ctx.fill()
+		} else if (points.length === 2) {
+			// Отдельная отрисовка для двух точек
+			ctx.beginPath()
+			ctx.moveTo(points[0].x, points[0].y)
+			ctx.lineTo(points[1].x, points[1].y)
+			ctx.stroke()
 		} else {
 			ctx.beginPath()
 			ctx.moveTo(points[0].x, points[0].y)
@@ -260,8 +268,17 @@ function redrawCanvas() {
 				}
 				ctx.quadraticCurveTo(points[i].x, points[i].y, midPoint.x, midPoint.y)
 			}
+
+			// Добавим последнюю точку прямой линией
 			ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y)
 			ctx.stroke()
+
+			// Иногда последний отрезок не захватывает — "запечатываем" его кругом
+			const end = points[points.length - 1]
+			ctx.beginPath()
+			ctx.arc(end.x, end.y, stroke.lineWidth / 2.2, 0, 2 * Math.PI)
+			ctx.fillStyle = stroke.color
+			ctx.fill()
 		}
 	}
 
