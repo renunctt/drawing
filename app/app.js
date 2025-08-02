@@ -95,11 +95,9 @@ document.addEventListener('touchstart', e => {
 			}
 		}
 	} else if (e.touches.length === 2) {
-		if (isDrawing && currentStroke && currentStroke.points.length > 0) {
-			drawingHistory.push(currentStroke)
+		if (isDrawing && currentStroke?.points.length > 0) {
+			drawingHistory.push({ ...currentStroke })
 			currentStroke = null
-			redoHistory.length = 0
-			redrawCanvas()
 		}
 
 		const [t1, t2] = getOrderedTouches(e.touches)
@@ -118,12 +116,9 @@ document.addEventListener('touchstart', e => {
 document.addEventListener(
 	'touchmove',
 	e => {
-		if (isTransforming) return
-
 		if (e.touches.length === 1 && isDrawing) {
 			e.preventDefault()
 			const touch = e.touches[0]
-			if (!isTouchInsideCanvas(touch)) return
 			const p = canvasPointFromTouch(touch)
 
 			currentStroke.points.push(p)
