@@ -81,8 +81,10 @@ function applyTransform() {
 let currentStroke = null
 
 document.addEventListener('touchstart', e => {
-	if (e.touches.length === 1 && !isTransforming) {
-		const touch = e.touches[0]
+	const touches = e.touches
+
+	if (touches.length === 1 && !isTransforming) {
+		const touch = touches[0]
 		if (isTouchInsideCanvas(touch)) {
 			lastDrawPoint = canvasPointFromTouch(touch)
 			isDrawing = true
@@ -94,9 +96,8 @@ document.addEventListener('touchstart', e => {
 				points: [lastDrawPoint],
 			}
 		}
-	} else if (e.touches.length === 2) {
-		if (isDrawing) return
-		const [t1, t2] = getOrderedTouches(e.touches)
+	} else if (touches.length === 2 && !isDrawing) {
+		const [t1, t2] = getOrderedTouches(touches)
 		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
 			isTransforming = true
 			lastTouches = [t1, t2]
