@@ -84,23 +84,19 @@ document.addEventListener('touchstart', e => {
 	const touches = e.touches
 
 	if (touches.length === 1 && !isTransforming) {
-		requestAnimationFrame(() => {
-			if (isDrawing || isTransforming) return // если уже что-то началось — выходим
-			if (e.touches.length > 1) return // второй палец появился — значит, трансформация
-			const touch = e.touches[0]
-			if (isTouchInsideCanvas(touch)) {
-				lastDrawPoint = canvasPointFromTouch(touch)
-				isDrawing = true
-				hasMoved = false
-				currentStroke = {
-					tool: 'pen',
-					color: currentStrokeColor,
-					lineWidth: currentLineWidth,
-					points: [lastDrawPoint],
-				}
+		const touch = touches[0]
+		if (isTouchInsideCanvas(touch)) {
+			lastDrawPoint = canvasPointFromTouch(touch)
+			isDrawing = true
+			hasMoved = false
+			currentStroke = {
+				tool: 'pen',
+				color: currentStrokeColor,
+				lineWidth: currentLineWidth,
+				points: [lastDrawPoint],
 			}
-		})
-	} else if (touches.length === 2 && !isDrawing) {
+		}
+	} else if (touches.length === 2) {
 		const [t1, t2] = getOrderedTouches(touches)
 		if (isTouchInsideCanvas(t1) && isTouchInsideCanvas(t2)) {
 			isTransforming = true
@@ -126,7 +122,7 @@ document.addEventListener(
 
 			hasMoved = true
 			redrawCanvas()
-		} else if (e.touches.length === 2 && isTransforming && !isDrawing) {
+		} else if (e.touches.length === 2 && isTransforming) {
 			e.preventDefault()
 			const [t1, t2] = getOrderedTouches(e.touches)
 			const newMid = getMidpoint(t1, t2)
